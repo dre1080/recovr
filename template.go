@@ -66,7 +66,7 @@ const panicHTML = `<!DOCTYPE html>
 				100% { background: rgba(220, 30, 30, 0.1); }
 			}
 
-			ol.linenums li:nth-child(5) {
+			ol.linenums li:nth-child(6) {
 				background: rgba(220, 30, 30, 0.1);
 				-webkit-animation: highlight 400ms linear 1;
 				-moz-animation: highlight 400ms linear 1;
