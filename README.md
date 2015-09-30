@@ -13,7 +13,6 @@ $ go get github.com/dre1080/recover
 ## Usage
 
 ``` go
-// main.go
 package main
 
 import (
@@ -39,7 +38,19 @@ func main() {
 }
 ```
 
-### Echo
+Terminal
+
+![Terminal](https://github.com/dre1080/recover/raw/master/img/screenshot-terminal.png)
+
+HTML
+
+![HTML](https://github.com/dre1080/recover/raw/master/img/screenshot-html.png)
+
+JSON
+
+![JSON](https://github.com/dre1080/recover/raw/master/img/screenshot-json.png)
+
+### Echo Example
 
 ```go
 ...
@@ -55,7 +66,7 @@ func main() {
 }
 ```
 
-### Goji
+### Goji Example
 
 ```go
 ...
@@ -69,17 +80,3 @@ func main() {
     goji.Serve()
 }
 ```
-
-## Example Output
-
-Terminal
-
-![Terminal](https://github.com/dre1080/recover/raw/master/img/screenshot-terminal.png)
-
-HTML
-
-![HTML](https://github.com/dre1080/recover/raw/master/img/screenshot-html.png)
-
-JSON
-
-![JSON](https://github.com/dre1080/recover/raw/master/img/screenshot-json.png)
