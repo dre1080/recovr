@@ -1,41 +1,22 @@
 /*Package recovr is a HTTP middleware that catches any panics and serves a proper error response.
 
-        package main
+package main
 
-        import (
-                "log"
-                "net/http"
+import (
+	"log"
+	"net/http"
 
-                "github.com/sirupsen/logrus"
-                "github.com/dre1080/recovr"
-        )
+	"github.com/dre1080/recovr"
+)
 
-        var myPanicHandler = http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-                panic("you should not have a handler that just panics ;)")
-        })
+var myPanicHandler = http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+	panic("you should not have a handler that just panics ;)")
+})
 
-        func main() {
-                recovery := recovr.New(recovr.Config{
-                        Logger: logrus.New(),
-                })
-
-                app := recovery(myPanicHandler)
-                http.ListenAndServe("0.0.0.0:3000", app)
-        }
-
-A GET request to "/" will output:
-
-        [PANIC] you should not have a handler that just panics ;)
-
-        Stack Trace:
-        ============
-
-        path/to/main.go:11                                              glob.func1
-        /usr/local/Cellar/go/1.14.2/libexec/src/net/http/server.go:1423  HandlerFunc.ServeHTTP
-        github.com/dre1080/recovr/recovr.go:66                        New.func1.1
-        /usr/local/Cellar/go/1.14.2/libexec/src/net/http/server.go:1423  HandlerFunc.ServeHTTP
-        /usr/local/Cellar/go/1.14.2/libexec/src/net/http/server.go:1863  serverHandler.ServeHTTP
-        /usr/local/Cellar/go/1.14.2/libexec/src/net/http/server.go:1362  (*conn).serve
-        /usr/local/Cellar/go/1.14.2/libexec/src/runtime/asm_amd64.s:1697 goexit
+func main() {
+	recovery := recovr.New()
+	app := recovery(myPanicHandler)
+	http.ListenAndServe("0.0.0.0:3000", app)
+}
 */
 package recovr
