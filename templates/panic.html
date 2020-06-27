@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>PANIC! at {{.URL}} - {{.Err}}</title>
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.1.1/styles/vs.min.css"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/1.4.6/tailwind.min.css"
+    />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.1.1/highlight.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.1.1/languages/go.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlightjs-line-numbers.js/2.8.0/highlightjs-line-numbers.min.js"></script>
+    <script>
+      hljs.initHighlightingOnLoad();
+      hljs.initLineNumbersOnLoad();
+    </script>
+    <style type="text/css">
+      @keyframes highlight {
+        0% {
+          background: rgba(220, 30, 30, 0.3);
+        }
+        100% {
+          background: rgba(220, 30, 30, 0.1);
+        }
+      }
+
+      pre,
+      code {
+        font-size: 0.875em;
+        white-space: pre-wrap;
+        overflow-x: none;
+      }
+
+      .hljs {
+        padding: 0;
+      }
+
+      .hljs-ln {
+        width: 100%;
+      }
+
+      .hljs-ln-n {
+        padding: 0 8px;
+      }
+
+      .hljs-ln tr:nth-child(6) .hljs-ln-code,
+      .hljs-ln tr:nth-child(6) .hljs-ln-numbers {
+        background: rgba(220, 30, 30, 0.1);
+        animation: 2s linear 1s infinite alternate highlight;
+      }
+
+      .trace .hljs-ln tr:nth-child(6) .hljs-ln-code,
+      .trace .hljs-ln tr:nth-child(6) .hljs-ln-numbers {
+        animation: none;
+      }
+
+      .hljs-ln-numbers {
+        -webkit-touch-callout: none;
+        user-select: none;
+        text-align: center;
+        color: #999;
+        border-right: 1px solid #777;
+        vertical-align: top;
+        padding-right: 5px;
+      }
+
+      td.hljs-ln-code {
+        padding-left: 10px;
+      }
+
+      .hljs-ln-code:hover {
+        background: rgba(0, 0, 0, 0.05);
+      }
+    </style>
+  </head>
+  <body class="bg-gray-100">
+    <header
+      class="bg-red-600 text-white px-8 py-4 border-b-4 border-dashed border-red-700"
+    >
+      <h1 class="text-2xl">
+        <strong>PANIC</strong>
+        <span class="text-red-900 text-xl">at {{.URL}}</span>
+      </h1>
+      <h2 class="text-lg">{{.Err}}</h2>
+    </header>
+
+    <div class="bg-red-700 text-white font-bold px-8 py-2 break-words">
+      <span class="mr-4">{{(index .Frames 0).Func}}</span>
+      <span>{{(index .Frames 0).Path}}:{{(index .Frames 0).Line}}</span>
+    </div>
+
+    <div
+      class="flex flex-col xl:flex-row border-t-4 border-dashed border-red-700"
+    >
+      <div class="w-full xl:w-1/2 bg-white">
+        <div class="shadow-inner">
+          <pre>
+              <code class="go" data-ln-start-from="{{sub (index .Frames 0).Line 5}}">{{index .Lines 0}}</code>
+            </pre>
+        </div>
+      </div>
+
+      <div
+        class="trace w-full xl:w-1/2 group opacity-50 transition-opacity duration-300 ease-in-out hover:opacity-100 shadow-inner"
+      >
+        <div class="font-bold text-lg uppercase pt-4 px-6">Trace:</div>
+        <div class="bg-gray-100 p-6 max-h-screen overflow-y-auto">
+          <ul>
+            {{range $index, $frame := .Frames}} {{if ne $index 0}}
+            <li class="mb-4 w-full">
+              <div
+                class="p-4 shadow-sm border border-solid border-gray-300 rounded-sm bg-white"
+              >
+                <div class="text-sm break-words">
+                  <div class="font-bold">{{$frame.Func}}</div>
+                  <div class="text-gray-700">
+                    {{$frame.Path}}, line {{$frame.Line}}
+                  </div>
+                </div>
+                <pre>
+                    <code class="go text-xs" data-ln-start-from="{{sub $frame.Line 5}}">{{index $.Lines $index}}</code>
+                  </pre>
+              </div>
+            </li>
+            {{end}} {{end}}
+          </ul>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>

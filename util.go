@@ -1,66 +1,86 @@
-package recover
+package recovr
+
+//go:generate go run github.com/gobuffalo/packr/v2/packr2
 
 import (
 	"bytes"
 	"io/ioutil"
 	"net/http"
-	"os"
-	"path/filepath"
 	"strings"
 	"text/template"
 
-	"github.com/facebookgo/stack"
+	packr "github.com/gobuffalo/packr/v2"
+	"github.com/ztrue/tracerr"
 )
 
-var gopaths []string
-
-func init() {
-	for _, p := range strings.Split(os.Getenv("GOPATH"), ":") {
-		if p != "" {
-			gopaths = append(gopaths, filepath.Join(p, "src")+"/")
-		}
-	}
-}
-
-func mustReadLines(filename string) []string {
+func mustReadFile(filename string) []byte {
 	bytes, err := ioutil.ReadFile(filename)
 	if err != nil {
 		panic(err)
 	}
+	return bytes
+}
+
+func mustReadLines(filename string) []string {
+	bytes := mustReadFile(filename)
 	return strings.Split(string(bytes), "\n")
 }
 
-func appendGOPATH(file string) string {
-	for _, p := range gopaths {
-		f := filepath.Join(p, file)
-		if _, err := os.Stat(f); err == nil {
-			return f
+func getLines(frames []tracerr.Frame) []string {
+	var lines []string
+	for _, frame := range frames {
+		src := mustReadLines(frame.Path)
+		start := frame.Line - 6
+		end := frame.Line + 5
+
+		if start < 0 {
+			start = 0
 		}
+
+		totalLines := len(src) - 1
+		if end > totalLines {
+			end = totalLines
+		}
+
+		lines = append(lines, strings.Join(src[start:end], "\n"))
 	}
-	return file
+	return lines
 }
 
-func compileTemplate(r *http.Request, err interface{}, frames []stack.Frame) []byte {
-	file := appendGOPATH(frames[0].File)
-	src := mustReadLines(file)
-
-	start := (frames[0].Line - 1) - 5
-	end := frames[0].Line + 5
-
-	lines := src[start:end]
+func compileTemplate(r *http.Request, err error, frames []tracerr.Frame) []byte {
+	if len(frames) == 0 {
+		return nil
+	}
 
 	var buf bytes.Buffer
 
-	t := template.Must(template.New("recover").Parse(panicHTML))
+	box := packr.New("recovr", "./templates")
+	html, boxErr := box.FindString("panic.html")
+	if boxErr != nil {
+		panic(boxErr)
+	}
+
+	funcMap := template.FuncMap{
+		"inc": func(i int) int {
+			return i + 1
+		},
+		"sub": func(i int, sub int) int {
+			return i - sub
+		},
+	}
+
+	t := template.Must(template.New("recovr").Funcs(funcMap).Parse(html))
 	t.Execute(&buf, struct {
-		URL         string
-		Err         interface{}
-		Name        string
-		File        string
-		StartLine   int
-		SourceLines string
-		Frames      []stack.Frame
-	}{r.URL.Path, err, frames[0].Name, frames[0].File, start + 1, strings.Join(lines, "\n"), frames})
+		URL    string
+		Err    error
+		Lines  []string
+		Frames []tracerr.Frame
+	}{
+		r.URL.Path,
+		err,
+		getLines(frames),
+		frames,
+	})
 
 	return buf.Bytes()
 }
