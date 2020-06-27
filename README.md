@@ -31,12 +31,7 @@ var myPanicHandler = http.HandlerFunc(func(w http.ResponseWriter, r *http.Reques
 })
 
 func main() {
-    recovery := recovr.New(&recovr.Options{
-        Log: log.Print,
-    })
-
-    // recoveryWithDefaults := recovr.New()
-
+    recovery := recovr.New()
     app := recovery(myPanicHandler)
     http.ListenAndServe("0.0.0.0:3000", app)
 }
