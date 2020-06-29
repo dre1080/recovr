@@ -4,7 +4,7 @@
 
 Recovr is a HTTP middleware that catches any panics and serves a proper error response.
 
-Works with all frameworks that support native http handler (eg. [Fiber](https://github.com/gofiber/fiber), [Echo](https://github.com/labstack/echo), [Gin](https://github.com/gin-gonic/gin), [Goji](https://github.com/zenazn/goji), etc.).
+Works with all frameworks that support native http handler (eg. [Echo](https://github.com/labstack/echo), [Goji](https://github.com/zenazn/goji), etc.).
 
 ![HTML](./images/html.jpg)
 
@@ -39,33 +39,6 @@ func main() {
 
 ## Examples
 
-### Fiber Example
-
-```go
-import (
-	"github.com/gofiber/fiber"
-	"github.com/gofiber/adaptor"
-)
-
-func main() {
-    app := fiber.New()
-    app.Use(adaptor.HTTPHandler(recovr.New()))
-    app.Listen(3000)
-}
-```
-
-### Gin Example
-
-```go
-import "github.com/gin-gonic/gin"
-
-func main() {
-    g := gin.Default()
-    g.Use(gin.WrapH(recovr.New()))
-    g.Run()
-}
-```
-
 ### Echo Example
 
 ```go
@@ -73,8 +46,8 @@ import "github.com/labstack/echo/v4"
 
 func main() {
     e := echo.New()
-    e.Use(echo.WrapHandler(recovr.New()))
-    e.Run(":3000")
+    e.Use(echo.WrapMiddleware(recovr.New()))
+    e.Logger.Fatal(e.Start(":1323"))
 }
 ```
 
